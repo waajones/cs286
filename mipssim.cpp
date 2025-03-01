@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
             instr.inst += "SLL\tR" + to_string(instr.rd) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.shift);
         } else if (instr.op == 5) { // BNE
             instr.inst += to_string(instr.addr) + "\tBNE\tR" + to_string(instr.rs) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.imm);
-  } else if (instr.op == 0 && instr.func == 8) { // JR
+        } else if (instr.op == 0 && instr.func == 8) { // JR
              instr.inst += "JR\tR" + to_string(instr.rs);
         } else if (instr.op == 0 && instr.func == 2) { // SRL
              instr.inst += "SRL\tR" + to_string(instr.rd) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.shift);
@@ -92,8 +92,8 @@ int main(int argc, char *argv[])
         } else if (instr.op == 0 && instr.func == 0 && instr.UI == 0) { // NOP
              instr.inst += "NOP";
         } else if (instr.op == 0 && instr.func == 13) { // BREAK
-      instr.inst += "BREAK";
-      breakEncountered = true;
+            instr.inst += "BREAK";
+            breakEncountered = true;
         }	
 
         MEM[addr] = instr;
@@ -168,9 +168,9 @@ int main(int argc, char *argv[])
       str += to_string(R[i]) + "\t";
     }
 
-    // Display data memory in chunks
+    // Display data
     str += "\n\ndata:";
-    // Display from address 164 to 256+ in chunks of 8
+    // Display from address 164 to 256+ in chunks of 8...Cant figure out 148 only :(
     for (int addr = 164; addr < 260; addr += 32) {
       str += "\n" + to_string(addr) + ":\t";
       for (int i = 0; i < 32; i += 4) {
