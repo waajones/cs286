@@ -26,12 +26,14 @@ int main(int argc, char *argv[])
   struct decodedInstruction {
     int op, rs, rt, rd, imm,I, shift, func;
     unsigned int UI;
-    int addr = 96;
-    string inst, binNoSpace;
+    int addr;
+    string inst, binNoSpace, binFormatted;
   };
+
   int amt = 4;
   int addr = 96;
   unordered_map< int, decodedInstruction> MEM;
+  bool breakEncountered = false;
 
   while( amt != 0 )
   {
@@ -51,33 +53,42 @@ int main(int argc, char *argv[])
       instr.rd = (instr.UI >> 11) & 0x1F;
       instr.shift = (instr.UI >> 6) & 0x1F;
       instr.func = instr.UI & 0x3F;
-      instr.imm = instr.UI & 0xFFFF;
-      instr.binNoSpace = bitset<32>(i).to_string();
-      instr.inst += instr.binNoSpace + "\t";
-
-      if (instr.op == 8) { // ADDI
-        instr.inst += to_string(instr.addr) + "\tADDI\tR" + to_string(instr.rt) + ", R" + to_string(instr.rs) + ", #" + to_string(instr.imm);
-      } else if (instr.op == 43) { // SW
-        instr.inst += to_string(instr.addr) + "\tSW\tR" + to_string(instr.rt) + ", " + to_string(instr.imm) + "(R" + to_string(instr.rs) + ")";
-      } else if (instr.op == 35) { // LW
-        instr.inst += to_string(instr.addr) + "\tLW\tR" + to_string(instr.rt) + ", " + to_string(instr.imm) + "(R" + to_string(instr.rs) + ")";
-      } else if (instr.op == 2) { // J
-        instr.inst += to_string(instr.addr) + "\tJ\t#" + to_string((instr.UI & 0x3FFFFFF) << 2);
-      } else if (instr.op == 0 && instr.func == 32) { // ADD
-        instr.inst += to_string(instr.addr) + "\tADD\tR" + to_string(instr.rd) + ", R" + to_string(instr.rs) + ", R" + to_string(instr.rt);
-      } else if (instr.op == 0 && instr.func == 34) { // SUB
-        instr.inst += to_string(instr.addr) + "\tSUB\tR" + to_string(instr.rd) + ", R" + to_string(instr.rs) + ", R" + to_string(instr.rt);
-      } else if (instr.op == 4) { // BEQ
-        instr.inst += to_string(instr.addr) + "\tBEQ\tR" + to_string(instr.rs) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.imm);
-      } else if (instr.op == 5) { // BNE
-        instr.inst += to_string(instr.addr) + "\tBNE\tR" + to_string(instr.rs) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.imm);
-      } else if (instr.op == 0 && instr.func == 13) { // BREAK
-	instr.inst += to_string(instr.addr) + "\tBREAK";
-    }
-      MEM[addr] = instr;
-      disout << instr.inst << endl;
-      addr += 4;
-    }
+      instr.imm = static_cast<int16_t>(instr.UI & 0xFFFF);
+      instr.binFormatted = bitset<32>(i).to_string();
+      instr.inst += instr.binFormatted + "\t" + to_string(instr.addr) + "\t";
+      if(breakEncountered){
+	disout<<instr.binFormatted << "\t" << instr.addr << "\t" << static_cast<int>(instr.UI) <<endl;
+      }else{  
+      	if (instr.op == 8) { // ADDI
+            instr.inst += to_string(instr.addr) + "\tADDI\tR" + to_string(instr.rt) + ", R" + to_string(instr.rs) + ", #" + to_string(instr.imm);
+      	} else if (instr.op == 43) { // SW
+            instr.inst += to_string(instr.addr) + "\tSW\tR" + to_string(instr.rt) + ", " + to_string(instr.imm) + "(R" + to_string(instr.rs) + ")";
+      	} else if (instr.op == 35) { // LW
+            instr.inst += to_string(instr.addr) + "\tLW\tR" + to_string(instr.rt) + ", " + to_string(instr.imm) + "(R" + to_string(instr.rs) + ")";
+      	} else if (instr.op == 2) { // J
+            instr.inst += to_string(instr.addr) + "\tJ\t#" + to_string((instr.UI & 0x3FFFFFF) << 2);
+      	} else if (instr.op == 0 && instr.func == 32) { // ADD
+            instr.inst += to_string(instr.addr) + "\tADD\tR" + to_string(instr.rd) + ", R" + to_string(instr.rs) + ", R" + to_string(instr.rt);
+      	} else if (instr.op == 0 && instr.func == 34) { // SUB
+            instr.inst += to_string(instr.addr) + "\tSUB\tR" + to_string(instr.rd) + ", R" + to_string(instr.rs) + ", R" + to_string(instr.rt);
+      	} else if (instr.op == 4) { // BEQ
+            instr.inst += to_string(instr.addr) + "\tBEQ\tR" + to_string(instr.rs) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.imm);
+      	} else if (instr.op == 1 && instr.rt == 0) { //BLTZ
+            instr.inst += "BLTZ\tR" + to_string(instr.rs) + ", #" + to_string(instr.imm * 4 + addr + 4);
+      	} else if (instr.op == 0 && instr.func == 0) { //SLL
+            instr.inst += "SLL\tR" + to_string(instr.rd) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.shift);
+      	} else if (instr.op == 5) { // BNE
+            instr.inst += to_string(instr.addr) + "\tBNE\tR" + to_string(instr.rs) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.imm);
+      	} else if (instr.op == 0 && instr.func == 13) { // BREAK
+	    instr.inst += to_string(instr.addr) + "\tBREAK";
+	    breakEncountered = true;
+      	}	
+      
+      	MEM[addr] = instr;
+      	disout << instr.inst << endl;
+      }
+       addr+=4;
+     }
   }
 
   // simulation
