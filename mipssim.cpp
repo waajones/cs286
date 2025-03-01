@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
       instr.binFormatted = bin.substr(0, 6) + " " + bin.substr(6, 5) + " " + bin.substr(11, 5) + " " + bin.substr(16, 5)+ " " + bin.substr(21, 5) + " " + bin.substr(26, 6);
       instr.inst += instr.binFormatted + "\t" + to_string(instr.addr) + "\t";
       if(breakEncountered){
-  disout<< bin << "\t"<< instr.addr <<"\t"<<static_cast<int>(instr.UI) <<endl;
+          disout<< bin << "\t"<< instr.addr <<"\t"<<static_cast<int>(instr.UI) <<endl;
       }else{
 
         if (instr.op == 8) { // ADDI
