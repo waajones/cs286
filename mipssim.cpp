@@ -58,8 +58,9 @@ int main(int argc, char *argv[])
       instr.binFormatted = bin.substr(0, 6) + " " + bin.substr(6, 5) + " " + bin.substr(11, 5) + " " + bin.substr(16, 5)+ " " + bin.substr(21, 5) + " " + bin.substr(26, 6);
       instr.inst += instr.binFormatted + "\t" + to_string(instr.addr) + "\t";
       if(breakEncountered){
-	disout<< bin << "\t" << instr.addr << "\t" << static_cast<int>(instr.UI) <<endl;
-      }else{  
+	disout<< bin << "\t"<< instr.addr <<"\t"<<static_cast<int>(instr.UI) <<endl;
+      }else{
+                 
       	if (instr.op == 8) { // ADDI
             instr.inst += to_string(instr.addr) + "\tADDI\tR" + to_string(instr.rt) + ", R" + to_string(instr.rs) + ", #" + to_string(instr.imm);
       	} else if (instr.op == 43) { // SW
@@ -80,6 +81,16 @@ int main(int argc, char *argv[])
             instr.inst += "SLL\tR" + to_string(instr.rd) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.shift);
       	} else if (instr.op == 5) { // BNE
             instr.inst += to_string(instr.addr) + "\tBNE\tR" + to_string(instr.rs) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.imm);
+	} else if (instr.op == 0 && instr.func == 8) { // JR
+             instr.inst += "JR\tR" + to_string(instr.rs);
+        } else if (instr.op == 0 && instr.func == 2) { // SRL
+             instr.inst += "SRL\tR" + to_string(instr.rd) + ", R" + to_string(instr.rt) + ", #" + to_string(instr.shift);
+        } else if (instr.op == 28 && instr.func == 2) { // MUL
+             instr.inst += "MUL\tR" + to_string(instr.rd) + ", R" + to_string(instr.rs) + ", R" + to_string(instr.rt);
+        } else if (instr.op == 0 && instr.func == 10) { // MOVZ
+             instr.inst += "MOVZ\tR" + to_string(instr.rd) + ", R" + to_string(instr.rs) + ", R" + to_string(instr.rt);
+        } else if (instr.op == 0 && instr.func == 0 && instr.UI == 0) { // NOP
+             instr.inst += "NOP";
       	} else if (instr.op == 0 && instr.func == 13) { // BREAK
 	    instr.inst += to_string(instr.addr) + "\tBREAK";
 	    breakEncountered = true;
@@ -91,7 +102,6 @@ int main(int argc, char *argv[])
        addr+=4;
      }
   }
-
   // simulation
   //
   int PC = 96;
