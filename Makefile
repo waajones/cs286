@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -Wall -O2
 TARGET = mipssim
-SRC = decode.cpp
+SRC = mipssim.cpp
 
 all: $(TARGET)
 
@@ -10,3 +10,4 @@ $(TARGET): $(SRC)
 
 clean:
 	rm -f $(TARGET)
+
